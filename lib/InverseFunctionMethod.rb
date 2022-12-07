@@ -1,6 +1,18 @@
 class InverseFunctionMethod
   def self.calculate(sigma)
-    random = rand(0.0..1.0)
-    sigma * Math.sqrt(-2 * Math.log(random))
+    sigma * Math.sqrt(-2 * Math.log(rand))
+  end
+
+  def self.get_values(count, left_boundary, sigma)
+    res = []
+    i = 0
+    while i < count do
+      x = calculate(sigma)
+      if x > left_boundary
+        res << x
+        i += 1
+      end
+    end
+    res.sort
   end
 end

@@ -1,8 +1,8 @@
 class NeumannMethod
-  def self.calculate(function_callback, maximum_value, right_boundary)
+  def self.calculate(function_callback, maximum_value, left_boundary, right_boundary)
     while true
-      x = rand(0.0..1.0) * right_boundary
-      y = rand(0.0..1.0) * maximum_value
+      x = left_boundary + rand * (right_boundary - left_boundary)
+      y = rand * maximum_value
 
       if function_callback.call(x) > y
         return x
@@ -10,11 +10,10 @@ class NeumannMethod
     end
   end
 
-  def self.get_values(count, func, max_val, right)
+  def self.get_values(count, func, max_val, left, right)
     result = []
     (0..count).each do
-      y = calculate(func, max_val, right)
-      result << y
+      result << calculate(func, max_val, left, right)
     end
     result.sort
   end

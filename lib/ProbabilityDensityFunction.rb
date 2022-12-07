@@ -3,9 +3,9 @@ class ProbabilityDensityFunction
     (x.to_f / (sigma ** 2)) * Math.exp((-(x ** 2)).to_f / (2 * sigma ** 2))
   end
 
-  def self.absolute(pdf, max, step)
+  def self.absolute(pdf, min, max, step)
     result = []
-    (0..max).step(step).each { |i|
+    (min..max).step(step).each { |i|
       result << pdf.call(i)
     }
     result
@@ -38,11 +38,11 @@ class ProbabilityDensityFunction
     Math.sqrt(variance / generation_count)
   end
 
-  def self.answer_for_diagram(max, step, listX)
+  def self.answer_for_diagram(min, max, step, listX)
     res= []
     a = 0
     j = 0
-    (0...max).step(step).each do |i|
+    (min...max).step(step).each do |i|
       y = 0
       if j != listX.count
         j = a
