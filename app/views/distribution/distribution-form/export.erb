@@ -1,0 +1,81 @@
+<div class="btn-group" id="export-calculation-data" style="visibility: hidden">
+  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Save result
+  </button>
+  <div class="dropdown-menu">
+    <a class="dropdown-item" id="export-as-xlsx">XLSX</a>
+    <a class="dropdown-item" id="export-as-json">JSON</a>
+  </div>
+</div>
+
+<script>
+    function initExport() {
+        if (!window.calculationResult) return;
+
+        const FILENAME_PREFIX = 'RayleighDistributionDataExport';
+
+        const initExportJson = () => {
+            // Init export as JSON
+            document.getElementById('export-calculation-data').style.visibility = 'visible';
+            const jsonExportElement = document.getElementById('export-as-json');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.calculationResult, null, 4));
+            jsonExportElement.setAttribute("href", dataStr);
+            jsonExportElement.setAttribute("download", `${FILENAME_PREFIX}.json`);
+        };
+
+        const initExportXlsx = () => {
+            const xlsxExportButton = document.getElementById('export-as-xlsx');
+            xlsxExportButton.addEventListener('click', () => {
+                const optionsInfo = [
+                    ["Generation count", window.calculationResult.options.generationCount],
+                    ["Right boundary", window.calculationResult.options.max_x],
+                    ["Step", window.calculationResult.options.step],
+                    ["Sigma", window.calculationResult.options.sigma],
+                    [''],
+                ];
+
+                const exportValuesInfo = [
+                    ['Mode (analytic)', window.calculationResult.pdfMeanValue],
+                    ['Variance (analytic)', window.calculationResult.pdfVarianceValue],
+                    [''],
+                    ['Mode (Neumann)', window.calculationResult.neumannMethodExpectedValue],
+                    ['Variance (Neumann)', window.calculationResult.neumannMethodVariance],
+                    ['Deviation (Neumann)', window.calculationResult.neumannMethodDeviation],
+                    [''],
+                    ['Mode (Metropolis)', window.calculationResult.metropolisMethodExpectedValue],
+                    ['Variance (Metropolis)', window.calculationResult.metropolisMethodVariance],
+                    ['Deviation (Metropolis)', window.calculationResult.metropolisMethodDeviation],
+                    [''],
+                    ['Mode (Inverse)', window.calculationResult.inverseMethodExpectedValue],
+                    ['Variance (Inverse)', window.calculationResult.inverseMethodVariance],
+                    ['Deviation (Inverse)', window.calculationResult.inverseMethodDeviation],
+                    [''],
+                ];
+
+                const calculationResultByMethods = [
+                    ['Neumann method frequencies', ...window.calculationResult.neumannMethod],
+                    ['Metropolis method frequencies', ...window.calculationResult.metropolisMethod],
+                    ['Inverse method frequencies', ...window.calculationResult.inverseMethod],
+                ];
+
+                const xlsxArrayData = [
+                    ...optionsInfo,
+                    ...exportValuesInfo,
+                    ...calculationResultByMethods,
+                ];
+
+                const SHEET_NAME = 'RayleighDistribution';
+                const XLSX = window.XLSX;
+                const wb = XLSX.utils.book_new();
+                wb.SheetNames.push(SHEET_NAME);
+                wb.Sheets[SHEET_NAME] = XLSX.utils.aoa_to_sheet(xlsxArrayData);
+                XLSX.writeFile(wb, `${FILENAME_PREFIX}.xlsx`);
+            });
+        };
+
+        initExportJson();
+        initExportXlsx();
+    }
+
+    initExport();
+</script>

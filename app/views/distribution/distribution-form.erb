@@ -1,0 +1,94 @@
+<%= render template: 'distribution/distribution-form/about-this-distribution' %>
+<%= render template: 'distribution/distribution-form/help' %>
+
+<div class="p-2">
+  <form>
+    <div class="d-flex align-items-center" style="gap: 18px;margin-bottom: 10px">
+        <!-- Button trigger "About this Distribution" modal -->
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#about-this-distribution-modal">
+          About
+        </button>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#help-modal">
+          Help
+        </button>
+    </div>
+
+    <div class="input-group mb-2">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">N = </span>
+      </div>
+      <input
+        type="number"
+        min="0"
+        class="form-control"
+        name="generation-count"
+        id="generation-count-distribution-input"
+        placeholder="Enter generation count value"
+        oninvalid="Number(this.value) < 0
+          ? this.setCustomValidity('Generation count should be greater than Zero')
+          : this.setCustomValidity('Generation count is required field')"
+        oninput="this.setCustomValidity('')"
+        required
+      >
+    </div>
+
+    <div class="input-group mb-2">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">X ≤ </span>
+      </div>
+      <input
+        type="number"
+        min="0"
+        class="form-control"
+        name="right-boundary"
+        id="right-boundary-distribution-input"
+        placeholder="Enter right boundary of calculation"
+        oninvalid="Number(this.value) < 0
+          ? this.setCustomValidity('Right boundary of calculation should be greater than Zero')
+          : this.setCustomValidity('Right boundary of calculation is required field')"
+        oninput="this.setCustomValidity('')"
+        required
+      >
+    </div>
+
+    <div class="input-group mb-2">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">σ = </span>
+      </div>
+      <input
+        type="number"
+        min="0"
+        class="form-control"
+        name="sigma"
+        id="sigma-distribution-input"
+        placeholder="Enter the sigma value"
+        step="0.01"
+        oninvalid="Number(this.value) < 0
+          ? this.setCustomValidity('Sigma value should be greater than Zero')
+          :this.setCustomValidity('Sigma value is required field')"
+        oninput="this.setCustomValidity('')"
+        required
+      >
+    </div>
+      <div class="d-flex align-items-center" style="gap: 16px;">
+        <button type="submit" class="btn btn-primary" style="background-color: coral; border-color: coral">Calculate</button>
+        <%= render template: 'distribution/distribution-form/export' %>
+      </div>
+  </form>
+</div>
+
+<script>
+    function fillForm() {
+        const params = (new URL(document.location)).searchParams;
+
+        const generationCount = params.get("generation-count");
+        const rightBoundary = params.get("right-boundary");
+        const sigma = params.get("sigma");
+
+        document.getElementById('generation-count-distribution-input').value = generationCount ? Number(generationCount) : 100000;
+        document.getElementById('right-boundary-distribution-input').value = rightBoundary ? Number(rightBoundary) : 10;
+        document.getElementById('sigma-distribution-input').value = sigma ? Number(sigma) : 2;
+    }
+
+    fillForm();
+</script>

@@ -1,0 +1,63 @@
+<canvas id="distribution-histogram-chart"></canvas>
+
+<script>
+    function initializeChart() {
+        if (!window.calculationResult) return;
+        const xMaximumValue = window.calculationResult.options.max_x;
+        const stepValue = window.calculationResult.options.step;
+
+        const chartElement = document.getElementById('distribution-histogram-chart');
+        const chartLabels = Array.from(Array(xMaximumValue / stepValue).keys()).map((_, index) => (index * stepValue).toFixed(1));
+
+        new Chart(chartElement, {
+            data: {
+                labels: chartLabels,
+                datasets: [
+                    {
+                        label: "Absolute",
+                        type: 'line',
+                        data: window.calculationResult.absoluteMethod,
+                        backgroundColor: "orange",
+                    },
+                    {
+                        label: "Neyman",
+                        data: window.calculationResult.neumannMethod,
+                        type: 'bar',
+                        backgroundColor: "violet",
+                    },
+                    {
+                        label: "Metropolis",
+                        data: window.calculationResult.metropolisMethod,
+                        type: 'bar',
+                        backgroundColor: "brown",
+                    },
+                    {
+                        label: "Inverse",
+                        data: window.calculationResult.inverseMethod,
+                        type: 'bar',
+                        backgroundColor: "green",
+                    },
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Frequency",
+                        },
+                        beginAtZero: true
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Interval value'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    initializeChart();
+</script>
