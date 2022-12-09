@@ -1,4 +1,4 @@
-<canvas id="distribution-histogram-chart"></canvas>
+<canvas id="graphic"></canvas>
 
 <script>
     function initializeChart() {
@@ -6,7 +6,7 @@
         const xMaximumValue = window.calculationResult.options.max_x;
         const stepValue = window.calculationResult.options.step;
 
-        const chartElement = document.getElementById('distribution-histogram-chart');
+        const chartElement = document.getElementById('graphic');
         const chartLabels = Array.from(Array(xMaximumValue / stepValue).keys()).map((_, index) => (index * stepValue).toFixed(1));
 
         new Chart(chartElement, {
@@ -17,25 +17,25 @@
                         label: "Absolute",
                         type: 'line',
                         data: window.calculationResult.absoluteMethod,
-                        backgroundColor: "orange",
+                        backgroundColor: "red",
                     },
                     {
                         label: "Neyman",
                         data: window.calculationResult.neumannMethod,
                         type: 'bar',
-                        backgroundColor: "violet",
+                        backgroundColor: "#add8e6",
                     },
                     {
                         label: "Metropolis",
                         data: window.calculationResult.metropolisMethod,
                         type: 'bar',
-                        backgroundColor: "brown",
+                        backgroundColor: "#0892d0",
                     },
                     {
                         label: "Inverse",
                         data: window.calculationResult.inverseMethod,
                         type: 'bar',
-                        backgroundColor: "green",
+                        backgroundColor: "#2a52be",
                     },
                 ]
             },

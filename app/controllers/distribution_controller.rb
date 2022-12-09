@@ -1,123 +1,95 @@
-require_relative '../../lib/ProbabilityDensityFunction'
-require_relative '../../lib/GeneratorCore'
-require_relative '../../lib/NeumannMethod'
-require_relative '../../lib/MetropolisMethod'
-require_relative '../../lib/InverseFunctionMethod'
 require_relative '../../lib/MethodCalculationUtils'
+require_relative '../../lib/Modules.rb'
+include DistributionModule
+include NeymanModule
+include MetropolisModule
+include InverseModule
+include VisualizationModule
+include GeneratorModule
 
 class DistributionController < ApplicationController
   def index
     generation_count = params['generation-count']
     max_x = params['right-boundary']
     min_x = 0
-    sigma = params['sigma']
+    alpha = params['alpha']
+    beta = params['beta']
     step = 0.1
 
-    if generation_count && max_x && sigma
+    if generation_count && max_x && alpha
       generation_count = generation_count.to_i
       max_x = max_x.to_f
-      sigma = sigma.to_f
+      alpha = alpha.to_f
+      beta = beta.to_f
     else
       return
     end
 
-    if generation_count < 1 || max_x <= 0 || sigma <= 0
+    if generation_count < 1 || max_x <= 0 || beta <= 0 || alpha <= 0
       return
     end
 
-    generator = GeneratorCore.new(max_x, step, generation_count)
-    total_generations_count = generator.get_total_generations_count
+    total_count = generations_count(max_x, step, generation_count)
 
-    pdf_calculation_lambda = -> (x) { ProbabilityDensityFunction.solve(sigma, x) }
-    pdf_values = ProbabilityDensityFunction.absolute(pdf_calculation_lambda, min_x, max_x, step)
+    pdf_lambda = -> (x) { pdf_function(x, alpha, beta) }
+    answer_lambda = ->(values) { answer(min_x, max_x, step, values) }
 
-    pdf_mode_value = ProbabilityDensityFunction.mode(sigma)
-    pdf_mean_value = ProbabilityDensityFunction.mean(sigma)
-    pdf_variance_value = ProbabilityDensityFunction.variance(sigma)
-    pdf_deviation_value = ProbabilityDensityFunction.deviation(sigma, total_generations_count)
-    pdf_maximum_value = ProbabilityDensityFunction.maximum_value(pdf_values)
+    pdf_values = get_absolute(pdf_lambda, min_x, max_x, step)
 
-    neumann_values = NeumannMethod.get_values(generation_count, pdf_calculation_lambda, pdf_maximum_value, min_x, max_x)
-    neumann_method = ProbabilityDensityFunction.answer_for_diagram(min_x, max_x, step, neumann_values)
+    pdf_mode = mode(alpha, beta)
+    pdf_mean = mean(alpha, beta)
+    pdf_variance = variance(alpha, beta)
+    pdf_deviation = deviation(alpha, beta, generation_count)
+    pdf_maximum_value = maximum_value(pdf_values)
 
-    metropolis_values = MetropolisMethod.get_values(generation_count, pdf_calculation_lambda, min_x, max_x)
-    metropolis_method = ProbabilityDensityFunction.answer_for_diagram(min_x, max_x, step, metropolis_values)
+    neumann_values = get_neumann(generation_count, pdf_lambda, pdf_maximum_value, min_x, max_x)
+    neumann_method = answer_lambda.call(neumann_values)
 
-    inverse_values = InverseFunctionMethod.get_values(generation_count, min_x, sigma)
-    inverse_method = ProbabilityDensityFunction.answer_for_diagram(min_x, max_x, step, inverse_values)
+    metropolis_values = get_metropolis(generation_count, pdf_lambda, min_x, max_x)
+    metropolis_method = answer_lambda.call(metropolis_values)
 
-    neumann_method_lambda = -> () { NeumannMethod.calculate(pdf_calculation_lambda, pdf_maximum_value, 0, max_x) }
-    previous_x_result = pdf_mode_value
+    inverse_values = get_inverse(generation_count, min_x, alpha, beta)
+    inverse_method = answer_lambda.call(inverse_values)
+
+    neumann_method_lambda = -> () { neyman(pdf_lambda, pdf_maximum_value, 0, max_x) }
+    previous_x_result = pdf_mode
     metropolis_method_lambda = -> () {
-      calculation_result = MetropolisMethod.calculate(pdf_calculation_lambda, min_x, max_x, previous_x_result)
+      calculation_result = metropolis(pdf_lambda, min_x, max_x, previous_x_result)
       previous_x_result = calculation_result
       calculation_result
     }
 
-    inverse_lambda = -> () { InverseFunctionMethod.calculate(sigma) }
+    inverse_lambda = -> () { inverse(alpha) }
+    generate_lambda = -> (func){generate(func, step, max_x, generation_count)}
 
-    neumann_method_data = generator.generate(neumann_method_lambda)
-    metropolis_method_data = generator.generate(metropolis_method_lambda)
-    inverse_data = generator.generate(inverse_lambda)
+    neumann_method_data = generate_lambda.call(neumann_method_lambda)
+    metropolis_method_data = generate_lambda.call(metropolis_method_lambda)
+    inverse_data = generate_lambda.call(inverse_lambda)
 
-    methods_calculation = MethodCalculationUtils.new
+    neumann_method_expected = MethodCalculationUtils.get_mean(total_count, neumann_method_data['sum'])
+    metropolis_method_expected = MethodCalculationUtils.get_mean(total_count, metropolis_method_data['sum'])
+    inverse_expected = MethodCalculationUtils.get_mean(total_count, inverse_data['sum'])
 
-    neumann_method_expected = methods_calculation.get_mean(
-      total_generations_count,
-      neumann_method_data['sum'],
-      )
-    metropolis_method_expected = methods_calculation.get_mean(
-      total_generations_count,
-      metropolis_method_data['sum'],
-      )
-    inverse_expected = methods_calculation.get_mean(
-      total_generations_count,
-      inverse_data['sum'],
-      )
+    neumann_method_variance = MethodCalculationUtils.get_variance(total_count, neumann_method_data['sum'], neumann_method_data['sum_squares'])
+    metropolis_method_variance = MethodCalculationUtils.get_variance(total_count, metropolis_method_data['sum'], metropolis_method_data['sum_squares'])
+    inverse_method_variance = MethodCalculationUtils.get_variance(total_count, inverse_data['sum'], inverse_data['sum_squares'])
 
-    neumann_method_variance = methods_calculation.get_variance(
-      total_generations_count,
-      neumann_method_data['sum'],
-      neumann_method_data['sum_squares'],
-      )
-    metropolis_method_variance = methods_calculation.get_variance(
-      total_generations_count,
-      metropolis_method_data['sum'],
-      metropolis_method_data['sum_squares'],
-      )
-    inverse_method_variance = methods_calculation.get_variance(
-      total_generations_count,
-      inverse_data['sum'],
-      inverse_data['sum_squares'],
-      )
-
-    neumann_method_deviation = methods_calculation.get_deviation(
-      total_generations_count,
-      neumann_method_data['sum'],
-      neumann_method_data['sum_squares'],
-      )
-    metropolis_method_deviation = methods_calculation.get_deviation(
-      total_generations_count,
-      metropolis_method_data['sum'],
-      metropolis_method_data['sum_squares'],
-      )
-    inverse_deviation = methods_calculation.get_deviation(
-      total_generations_count,
-      inverse_data['sum'],
-      inverse_data['sum_squares'],
-      )
+    neumann_method_deviation = MethodCalculationUtils.get_deviation(total_count, neumann_method_data['sum'], neumann_method_data['sum_squares'])
+    metropolis_method_deviation = MethodCalculationUtils.get_deviation(total_count, metropolis_method_data['sum'], metropolis_method_data['sum_squares'])
+    inverse_deviation = MethodCalculationUtils.get_deviation(total_count, inverse_data['sum'], inverse_data['sum_squares'])
 
     @calculation_result = {
       'options' => {
         'generationCount' => generation_count,
         'max_x' => max_x,
         'step' => step,
-        'sigma' => sigma,
+        'alpha' => alpha,
+        'beta' => beta,
       },
       'pdfMaxValue' => pdf_maximum_value,
-      'pdfMeanValue' => pdf_mean_value,
-      'pdfVarianceValue' => pdf_variance_value,
-      'pdfDeviationValue' => pdf_deviation_value,
+      'pdfMeanValue' => pdf_mean,
+      'pdfVarianceValue' => pdf_variance,
+      'pdfDeviationValue' => pdf_deviation,
       'absoluteMethod' => pdf_values,
       'neumannMethod' => neumann_method,
       'metropolisMethod' => metropolis_method,
@@ -132,5 +104,9 @@ class DistributionController < ApplicationController
       'metropolisMethodDeviation' => metropolis_method_deviation,
       'inverseMethodDeviation' => inverse_deviation,
     }
+  end
+
+  def generations_count(max, step, n)
+    (max / step) * n
   end
 end

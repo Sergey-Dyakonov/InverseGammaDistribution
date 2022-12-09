@@ -12,7 +12,7 @@
     function initExport() {
         if (!window.calculationResult) return;
 
-        const FILENAME_PREFIX = 'RayleighDistributionDataExport';
+        const FILENAME_PREFIX = 'Inverse_gamma_export';
 
         const initExportJson = () => {
             // Init export as JSON
@@ -30,7 +30,8 @@
                     ["Generation count", window.calculationResult.options.generationCount],
                     ["Right boundary", window.calculationResult.options.max_x],
                     ["Step", window.calculationResult.options.step],
-                    ["Sigma", window.calculationResult.options.sigma],
+                    ["Alpha", window.calculationResult.options.alpha],
+                    ["Beta", window.calculationResult.options.beta],
                     [''],
                 ];
 

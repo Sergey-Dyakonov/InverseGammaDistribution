@@ -1,12 +1,4 @@
-<!-- About this Distribution modal -->
-<div
-  class="modal fade"
-  id="help-modal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="help-modal-label"
-  aria-hidden="true"
->
+<div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal-label" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -18,13 +10,39 @@
       <div class="modal-body">
         <div class="d-flex flex-column" style="gap: 16px">
           <div class="d-flex justify-content-between align-items-center" style="font-size: 14px; gap: 16px;">
-            <span>This program is a generator of the turnaround value using additional methods of turning functions, Neumann and the Metropolis. In the information window "About" you can get acquainted with the basic theoretical information about the Rayleigh distribution.<br>To construct a graph and obtain the calculation results, you need to enter the following values: N(generation count value), x(right boundary), σ(sigma value) and click on the button "Calculate". After constructing the graph and calculations, it is possible to save the calculation results to a file. To do this, click the button "Save result".</span>
+            <h6>This program is a generator of the value using methods of inverse functions, Neumann and the Metropolis.</h6>
+            <br>
+          </div>
+          <strong>Usage:</strong>
+          <span>To construct a graph and obtain the calculation results, you need to enter the following values:
+            <ul>
+              <li>N ∈ [1; +∞);</li>
+              <li>X ∈ (0; +∞);</li>
+              <li>α ∈ (0; +∞);</li>
+              <li>β ∈ (0; +∞).</li>
+            </ul>
+            Then click on the button "Compute". Also it is possible to save the calculation results to a file. Just click "Save result".</span>
+          <div class="d-flex justify-content-between align-items-center" style="font-size: 14px; gap: 16px;">
+            <span>The inverse gamma distribution is a two-parameter family of continuous probability distributions on the positive real line, which is the distribution of the reciprocal of a variable distributed according to the gamma distribution. <br><a href="https://en.wikipedia.org/wiki/Inverse-gamma_distribution">More info</a></span>
+            <img src="par.jpg" alt="Parameters Image" style="object-fit: contain;height: 100px; width: 100px" />
+          </div>
+          <div class="d-flex justify-content-center" style="gap: 32px; font-size: 12px">
+            <div class="d-flex flex-column align-items-center">
+              <span>The probability density function (PDF)</span>
+              <img src="PDF.png" alt="PDF Image" style="object-fit: contain; height: 250px; width: 250px" />
+              <img src="f1.jpg" alt="Image1" style="object-fit: contain; height: 100px; width: 200px" />
+            </div>
+            <div class="d-flex flex-column align-items-center">
+              <span>The cumulative distribution function (CDF)</span>
+              <img src="CDF.png" alt="CDF Image" style="object-fit: contain;height: 250px; width: 250px" />
+              <img src="f2.jpg" alt="Image2" style="object-fit: contain; height: 100px; width: 100px" />
+            </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <div class="d-flex align-items-center" style="gap: 16px;">
-          <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got you!</button>
         </div>
       </div>
     </div>
