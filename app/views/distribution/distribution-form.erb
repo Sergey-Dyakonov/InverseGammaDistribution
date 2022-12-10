@@ -8,7 +8,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon1">α = </span>
         </div>
-        <input type="number" min="0" class="form-control" name="alpha" id="alpha-input" placeholder="(0; inf)"
+        <input type="number" min="0" class="form-control" name="alpha" id="alpha-input" placeholder="(0; inf)" step="0.01"
                oninvalid="Number(this.value) < 0
                  ? this.setCustomValidity('Alpha value should be greater than Zero')
                  :this.setCustomValidity('Alpha value is required field')"
@@ -18,7 +18,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon1">β = </span>
         </div>
-        <input type="number" class="form-control" id="beta-input" name="beta" placeholder="(0; inf)"
+        <input type="number" class="form-control" id="beta-input" name="beta" placeholder="(0; inf)" step="0.01"
                oninvalid="Number(this.value) < 0
                  ? this.setCustomValidity('Beta value should be greater than Zero')
                  :this.setCustomValidity('Beta value is required field')"
